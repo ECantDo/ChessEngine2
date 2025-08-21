@@ -36,7 +36,7 @@ public class Version1 implements Bot {
 
 		for (Move move : board.legalMoves()) {
 			board.doMove(move);
-			double score = -negamax(board, 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, nextSideToMove);
+			double score = -negamax(board, MAX_DEPTH - 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, nextSideToMove);
 			board.undoMove();
 			if (score > bestScore) {
 				bestScore = score;
@@ -54,8 +54,8 @@ public class Version1 implements Bot {
 	 * @return
 	 */
 	private double negamax(Board board, int depth, double alpha, double beta, Side sideToMove) {
-		if (depth >= MAX_DEPTH || board.isMated() || board.isDraw()) {
-			return evaluate(board, sideToMove);
+		if (depth == 0 || board.isMated() || board.isDraw()) {
+			return evaluate(board, depth);
 		}
 
 		double maxValue = Double.NEGATIVE_INFINITY;
@@ -63,37 +63,32 @@ public class Version1 implements Bot {
 		Side nextSideToMove = sideToMove.flip();
 		for (Move move : board.legalMoves()) {
 			board.doMove(move);
-			double score = -negamax(board, depth + 1, -beta, -alpha, nextSideToMove);
+			double score = -negamax(board, depth - 1, -beta, -alpha, nextSideToMove);
 			board.undoMove();
 
 			maxValue = Math.max(maxValue, score);
 			alpha = Math.max(alpha, score);
 
-			if (alpha >= beta)
-				break;
+//			if (alpha >= beta)
+//				break;
 		}
 		return maxValue;
 	}
 
-	private double evaluate(Board board, Side sideMoved) {
+	private double evaluate(Board board, int depth) {
 		int score = 0;
-		if (board.isMated()) {
-			if (sideMoved == Side.BLACK)
-				return Double.NEGATIVE_INFINITY;
-			else
-				return Double.POSITIVE_INFINITY;
-		}
+		if (board.isMated())
+			return -100_000_000 + depth;
 		if (board.isDraw())
 			return 0;
 
 		for (Square square : Square.values()) {
 			Piece piece = board.getPiece(square);
-
 			if (piece != null && piece.getPieceType() != PieceType.NONE) {
 				score += PIECE_VALUES.getOrDefault(piece, 0);
 			}
 		}
 
-		return score;
+		return board.getSideToMove() == Side.WHITE ? score : -score;
 	}
 }
