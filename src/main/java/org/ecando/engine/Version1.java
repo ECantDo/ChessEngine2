@@ -10,7 +10,7 @@ import java.util.Random;
 public class Version1 implements Bot {
 
 	private final static int MAX_DEPTH = 4;
-	private final static HashMap<Piece, Integer> PIECE_VALUES = new HashMap<>();
+	public final static HashMap<Piece, Integer> PIECE_VALUES = new HashMap<>();
 	private final static Random random = new Random();
 
 	static {
@@ -69,14 +69,16 @@ public class Version1 implements Bot {
 			maxValue = Math.max(maxValue, score);
 			alpha = Math.max(alpha, score);
 
-//			if (alpha >= beta)
-//				break;
+			if (alpha >= beta)
+				break;
 		}
 		return maxValue;
 	}
 
 	private double evaluate(Board board, int depth) {
 		int score = 0;
+		boolean endgame = Tables.isEndgame(board);
+
 		if (board.isMated())
 			return -100_000_000 + depth;
 		if (board.isDraw())
@@ -86,6 +88,7 @@ public class Version1 implements Bot {
 			Piece piece = board.getPiece(square);
 			if (piece != null && piece.getPieceType() != PieceType.NONE) {
 				score += PIECE_VALUES.getOrDefault(piece, 0);
+				score += Tables.getTableValue(endgame, square, piece);
 			}
 		}
 
