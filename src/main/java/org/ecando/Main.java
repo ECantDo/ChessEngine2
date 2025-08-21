@@ -6,7 +6,7 @@ import com.frequentlymisseddeadlines.chessuci.UciProtocol;
 import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.move.Move;
 import org.ecando.engine.Bot;
-import org.ecando.engine.RandomBot;
+import org.ecando.engine.Version1;
 
 import java.util.Scanner;
 
@@ -14,14 +14,14 @@ public class Main {
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		Board board = new Board();
-		Bot bot = new RandomBot();
+		Bot bot = new Version1();
 
 		while (in.hasNextLine()) {
 			String line = in.nextLine().trim();
 
 			if (line.equals("uci")) {
 				// Identify the engine
-				System.out.println("id name E_RandoTron");
+				System.out.println("id name Version1");
 				System.out.println("id author ECanDo");
 				System.out.println("uciok");
 				System.out.flush();
