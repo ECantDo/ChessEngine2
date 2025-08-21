@@ -10,6 +10,7 @@ import java.util.Random;
 public class Version1 implements Bot {
 
 	private final static int MAX_DEPTH = 4;
+	private final static int MIN_DEPTH = MAX_DEPTH - 3;
 	public final static HashMap<Piece, Integer> PIECE_VALUES = new HashMap<>();
 	private final static Random random = new Random();
 
@@ -30,14 +31,19 @@ public class Version1 implements Bot {
 
 	@Override
 	public Move selectMove(Board board) {
+		HashMap<Long, Double> hashMap = new HashMap<>();
+
 		Side nextSideToMove = board.getSideToMove().flip();
 		double bestScore = Double.NEGATIVE_INFINITY;
 		ArrayList<Move> bestMoves = new ArrayList<>();
 
 		for (Move move : board.legalMoves()) {
 			board.doMove(move);
-			double score = -negamax(board, MAX_DEPTH - 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, nextSideToMove);
+			double score = negamax(board, MAX_DEPTH - 1, Double.NEGATIVE_INFINITY,
+					Double.POSITIVE_INFINITY, nextSideToMove, hashMap);
 			board.undoMove();
+
+//			System.out.println("INFO: MOVE " + move + " SCORE " + score);
 			if (score > bestScore) {
 				bestScore = score;
 				bestMoves.clear();
@@ -53,36 +59,45 @@ public class Version1 implements Bot {
 	 * @param depth The current depth
 	 * @return
 	 */
-	private double negamax(Board board, int depth, double alpha, double beta, Side sideToMove) {
-		if (depth == 0 || board.isMated() || board.isDraw()) {
+	private double negamax(Board board, int depth, double alpha, double beta, Side sideToMove,
+	                       HashMap<Long, Double> hashMap) {
+
+		long zobrist = board.getZobristKey();
+		if (hashMap.containsKey(zobrist))
+			return hashMap.get(zobrist);
+
+		int offset = (MAX_DEPTH - depth) << 2;
+
+		if (board.isMated())
+			return 100_000 - offset;
+		else if (board.isDraw())
+			return 0;
+
+		if (depth == 0)
 			return evaluate(board, depth);
-		}
 
 		double maxValue = Double.NEGATIVE_INFINITY;
 
 		Side nextSideToMove = sideToMove.flip();
 		for (Move move : board.legalMoves()) {
 			board.doMove(move);
-			double score = -negamax(board, depth - 1, -beta, -alpha, nextSideToMove);
+			double score = -negamax(board, depth - 1, -beta, -alpha, nextSideToMove, hashMap);
 			board.undoMove();
 
 			maxValue = Math.max(maxValue, score);
 			alpha = Math.max(alpha, score);
 
-			if (alpha >= beta)
-				break;
+//			if (alpha >= beta)
+//				break;
 		}
+
+		hashMap.put(zobrist, maxValue); // Store after all children searched
 		return maxValue;
 	}
 
 	private double evaluate(Board board, int depth) {
 		int score = 0;
 		boolean endgame = Tables.isEndgame(board);
-
-		if (board.isMated())
-			return -100_000_000 + depth;
-		if (board.isDraw())
-			return 0;
 
 		for (Square square : Square.values()) {
 			Piece piece = board.getPiece(square);
@@ -93,6 +108,6 @@ public class Version1 implements Bot {
 			score += Tables.getTableValue(endgame, square, piece);
 		}
 
-		return board.getSideToMove() == Side.WHITE ? score : -score;
+		return board.getSideToMove() == Side.WHITE ? -score : score;
 	}
 }

@@ -32,14 +32,15 @@ public class Main {
 				System.out.flush();
 
 			} else if (line.startsWith("position")) {
+//				System.out.println("INFO: POSITION STR: " + line);
 				if (line.contains("startpos")) {
 					board = new Board(); // official startpos FEN
-				}
-				if (line.contains("fen")) {
-					String fen = line.substring(line.indexOf("fen") + 4).trim();
+				} else {
+					String fen = line.substring(9);
 					if (fen.contains("moves")) {
 						fen = fen.substring(0, fen.indexOf("moves")).trim();
 					}
+//					System.out.println("INFO FEN: " + fen);
 					board.loadFromFen(fen);
 				}
 				if (line.contains("moves")) {

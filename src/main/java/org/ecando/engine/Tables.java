@@ -103,7 +103,7 @@ public class Tables {
 		int endgameTable = isEndgame ? 1 : 0;
 
 		int idx = square.ordinal();
-		if (side == Side.BLACK)
+		if (side == Side.WHITE)
 			idx = flipIndex(idx);
 
 		int result = switch (pieceType) {
