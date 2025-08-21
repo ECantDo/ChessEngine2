@@ -102,7 +102,7 @@ public class Tables {
 		if (side == Side.BLACK)
 			idx = flipIndex(idx);
 
-		return switch (pieceType) {
+		int result = switch (pieceType) {
 			case PAWN -> PAWN_TABLE[endgameTable][idx];
 			case KNIGHT -> KNIGHT_TABLE[idx];
 			case BISHOP -> BISHOP_TABLE[idx];
@@ -111,6 +111,11 @@ public class Tables {
 			case KING -> KING_TABLE[endgameTable][idx];
 			default -> 0;
 		};
+
+		if (side == Side.BLACK)
+			return -result;
+		return result;
+
 	}
 
 	public static boolean isEndgame(Board board) {
