@@ -21,7 +21,7 @@ public class Main {
 
 			if (line.equals("uci")) {
 				// Identify the engine
-				System.out.println("id name EsNegamaxBot");
+				System.out.println("id name NegamaxBot2");
 				System.out.println("id author ECanDo");
 				System.out.println("uciok");
 				System.out.flush();

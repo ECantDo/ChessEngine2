@@ -95,6 +95,10 @@ public class Tables {
 
 	public static int getTableValue(boolean isEndgame, Square square, Piece piece) {
 		PieceType pieceType = piece.getPieceType();
+		System.out.println("Piece: " + piece + " PieceType: " + pieceType);
+		if (pieceType == null || pieceType == PieceType.NONE)
+			return 0;
+
 		Side side = piece.getPieceSide();
 		int endgameTable = isEndgame ? 1 : 0;
 

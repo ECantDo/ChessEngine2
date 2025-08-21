@@ -86,10 +86,11 @@ public class Version1 implements Bot {
 
 		for (Square square : Square.values()) {
 			Piece piece = board.getPiece(square);
-			if (piece != null && piece.getPieceType() != PieceType.NONE) {
-				score += PIECE_VALUES.getOrDefault(piece, 0);
-				score += Tables.getTableValue(endgame, square, piece);
-			}
+			if ((piece == null) || (piece.getPieceType() == PieceType.NONE))
+				continue;
+
+			score += PIECE_VALUES.getOrDefault(piece, 0);
+			score += Tables.getTableValue(endgame, square, piece);
 		}
 
 		return board.getSideToMove() == Side.WHITE ? score : -score;
